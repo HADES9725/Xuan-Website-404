@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>404 - 页面被玄霜吃掉啦！</title>
+    <link rel="shortcut icon" href="img/favicon.png"/>
+    <link rel="stylesheet" href="./css/plugins.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <style>
+      * { box-sizing: border-box; }
+
+      /* ── 基础布局 ── */
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      .page-404 {
+        text-align: center;
+        padding: 40px 20px;
+        max-width: 700px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      /* ── 图片 ── */
+      .page-404 figure {
+        margin: 0 auto 40px;
+        max-width: 400px;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+      .page-404 figure img {
+        width: 100%;
+        height: auto;
+        display: block;
+        transition: transform 0.15s ease;
+      }
+      .page-404 figure:hover img {
+        transform: scale(1.03);
+      }
+      .page-404 figure:active img {
+        transform: scale(0.97);
+      }
+
+      /* ── 文字 ── */
+      .page-404 h1 {
+        font-size: 2rem;
+        margin: 0 0 16px;
+        color: #343f52;
+        font-weight: 700;
+      }
+      .page-404 p {
+        font-size: 1.1rem;
+        color: #60697b;
+        margin: 0 0 32px;
+        line-height: 1.7;
+      }
+
+      /* ── 按钮 ── */
+      .btn-home {
+        display: inline-block;
+        padding: 12px 32px;
+        background: #3f78e0;
+        color: #fff;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      }
+      .btn-home:hover {
+        background: #2e65c9;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(63,120,224,0.35);
+        text-decoration: none;
+      }
+
+      /* ── 响应式：手机 ── */
+      @media (max-width: 600px) {
+        .page-404 {
+          padding: 24px 16px;
+        }
+        .page-404 figure {
+          max-width: 80vw;
+          margin-bottom: 28px;
+        }
+        .page-404 h1 {
+          font-size: 1.4rem;
+        }
+        .page-404 p {
+          font-size: 0.95rem;
+          margin-bottom: 24px;
+        }
+        .btn-home {
+          padding: 10px 28px;
+          font-size: 0.95rem;
+        }
+      }
+
+      /* ── 响应式：平板 ── */
+      @media (min-width: 601px) and (max-width: 900px) {
+        .page-404 figure {
+          max-width: 320px;
+        }
+        .page-404 h1 {
+          font-size: 1.7rem;
+        }
+      }
+
+      /* ── 深色模式 ── */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #111318;
+        }
+        .page-404 h1 {
+          color: #e2e8f0;
+        }
+        .page-404 p {
+          color: #94a3b8;
+        }
+        .btn-home {
+          background: #4f87f0;
+        }
+        .btn-home:hover {
+          background: #3f78e0;
+          box-shadow: 0 6px 20px rgba(79,135,240,0.4);
+        }
+      }
+
+      /* ── 雪花画布 ── */
+      #snow-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        display: none;
+      }
+
+
+
+    </style>
+  </head>
+  <body>
+    <!-- 雪花 Canvas -->
+    <canvas id="snow-canvas"></canvas>
+
+    <div class="page-404">
+      <figure id="snow-trigger">
+        <img src="img/404.png" alt="404"/>
+      </figure>
+      <h1>xwx… 页面被玄霜吃掉啦！</h1>
+      <p>您要查找的页面不可用，请访问其它页面或使用下面的按钮回到旋窝</p>
+      <a href="https://hadesxuan.top" class="btn-home">返回旋窝</a>
+    </div>
+
+    <script>
+    (function () {
+      var canvas = document.getElementById('snow-canvas');
+      var ctx = canvas.getContext('2d');
+      var flakes = [];
+      var animId = null;
+      var spawnTimer = null;
+      var active = false;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function randomBetween(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      function createFlake() {
+        return {
+          x: randomBetween(0, canvas.width),
+          y: randomBetween(-20, -5),
+          r: randomBetween(3, 8),
+          speed: randomBetween(1.5, 4),
+          drift: randomBetween(-0.8, 0.8),
+          opacity: randomBetween(0.5, 1),
+          sway: randomBetween(0, Math.PI * 2),
+          swaySpeed: randomBetween(0.01, 0.03)
+        };
+      }
+
+      function spawnBurst(n) {
+        for (var i = 0; i < n; i++) {
+          flakes.push(createFlake());
+        }
+      }
+
+      function drawFlake(f) {
+        ctx.save();
+        ctx.globalAlpha = f.opacity;
+        ctx.fillStyle = '#b8d8f8';
+        ctx.shadowColor = '#a0c8ff';
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function step() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (var i = flakes.length - 1; i >= 0; i--) {
+          var f = flakes[i];
+          f.sway += f.swaySpeed;
+          f.x += f.drift + Math.sin(f.sway) * 0.5;
+          f.y += f.speed;
+          drawFlake(f);
+          if (f.y > canvas.height + 10) {
+            flakes.splice(i, 1);
+          }
+        }
+        if (flakes.length > 0) {
+          animId = requestAnimationFrame(step);
+        } else {
+          canvas.style.display = 'none';
+          active = false;
+          animId = null;
+        }
+      }
+
+      function startSnow() {
+        if (active) return;
+        active = true;
+        resize();
+        canvas.style.display = 'block';
+        flakes = [];
+
+        // 一次性涌出 80 片雪花
+        spawnBurst(80);
+
+        // 接下来 3 秒内持续补充
+        var elapsed = 0;
+        spawnTimer = setInterval(function () {
+          elapsed += 200;
+          spawnBurst(20);
+          if (elapsed >= 3000) {
+            clearInterval(spawnTimer);
+            spawnTimer = null;
+          }
+        }, 200);
+
+        if (animId) cancelAnimationFrame(animId);
+        animId = requestAnimationFrame(step);
+      }
+
+      document.getElementById('snow-trigger').addEventListener('click', startSnow);
+    })();
+    </script>
+  </body>
+</html>
